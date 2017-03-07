@@ -8,7 +8,7 @@ dtmAdded=DocumentTermMatrix(corpusAdded)
 dtmAdded
 sparseAdded=removeSparseTerms(dtmAdded,0.997)
 sparseAdded
-wordsAdded=as.data.frame(as.matrix(sparseAdded))
+wordsAdded=as.data.frame(as.matrix(sparseAdded)) 
 colnames(wordsAdded)=paste("A",colnames(wordsAdded))
 corpusRemoved=Corpus(VectorSource(wiki$Removed))
 corpusRemoved=tm_map(corpusRemoved,removeWords,stopwords("english"))
