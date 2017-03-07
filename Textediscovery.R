@@ -1,0 +1,30 @@
+bid=read.csv("energy_bids.csv",stringsAsFactors = FALSE)
+corpus=Corpus(VectorSource(bid$email))
+corpus[[1]]$content
+bid$email[1]
+corpus=tm_map(corpus,content_transformer(tolower))
+corpus=tm_map(corpus,removePunctuation)
+corpus=tm_map(corpus,removeWords,stopwords("english"))
+length(stopwords("english"))
+corpus[[1]]$content
+corpus=tm_map(corpus,stemDocument)
+dtm=DocumentTermMatrix(corpus)
+dtm
+dtm=removeSparseTerms(dtm,0.97)
+dtm
+labeledTerms=as.data.frame(as.matrix(dtm))
+colnames(labeledTerms)=make.names(colnames(labeledTerms))
+labeledTerms$responsive=bid$responsive
+set.seed(144)
+spl=sample.split(labeledTerms$responsive,0.7)
+train=subset(labeledTerms,spl==TRUE)
+test=subset(labeledTerms,spl==FALSE)
+cart=rpart(responsive~.,data=train,method = "class")
+prp(cart)
+predcart=predict(cart,newdata=test)
+pred.prob=predcart[,2]
+table(test$responsive,pred.prob>0.5)
+predroc=prediction(pred.prob,test$responsive)
+perf=performance(predroc,"tpr","fpr")
+performance(predroc,"auc")@y.values
+plot(perf,colorize=TRUE)
